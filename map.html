@@ -224,6 +224,7 @@ function applyHighlight() {
     if (e.from === id) outSet.add(e.to);
     if (e.to === id) inSet.add(e.from);
   });
+  const showBack = document.getElementById("backT").checked;
   edgeEls.forEach(({el, e, back}) => {
     let stroke = back ? "#7a5c28" : "#39415a", w = 1.1, op = N > 0 ? 0.1 : 0.25;
     const dv = revDist[e.to];
@@ -233,6 +234,8 @@ function applyHighlight() {
     el.setAttribute("stroke", stroke);
     el.setAttribute("stroke-width", w);
     el.setAttribute("opacity", op);
+    // підсвічена пунктирна дуга видима навіть коли пунктир глобально схований
+    if (back) el.style.display = (op === 1 || showBack) ? "" : "none";
     if (op === 1) el.parentNode.appendChild(el);
   });
   for (const nid in nodeEls) {
@@ -253,10 +256,12 @@ function select(id) {
 }
 function clearSel() {
   selected = null; revDist = {}; maxRev = 0;
+  const showBack = document.getElementById("backT").checked;
   edgeEls.forEach(({el, back}) => {
     el.setAttribute("stroke", back ? "#7a5c28" : "#39415a");
     el.setAttribute("stroke-width", 1.1);
     el.setAttribute("opacity", 1);
+    if (back) el.style.display = showBack ? "" : "none";
   });
   for (const nid in nodeEls) {
     nodeEls[nid].g.setAttribute("opacity", 1);
@@ -392,6 +397,7 @@ function jump() {
 }
 document.getElementById("q").addEventListener("keydown", ev => { if (ev.key === "Enter") jump(); });
 function toggleBack() {
+  if (selected) { applyHighlight(); return; }
   const show = document.getElementById("backT").checked;
   edgeEls.forEach(({el, back}) => { if (back) el.style.display = show ? "" : "none"; });
 }
